@@ -1,7 +1,9 @@
 import { AnimatedFlashList, ListRenderItemInfo } from '@shopify/flash-list';
-import React, { useMemo, useRef, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import React, { useMemo, useRef, useState, useEffect } from 'react';
+import { StyleSheet, View, Text } from 'react-native';
 import { runOnJS, useAnimatedReaction } from 'react-native-reanimated';
+import { format, getISOWeek } from 'date-fns'; // Import des fonctions nécessaires
+import { fr } from 'date-fns/locale';
 import { DEFAULT_PROPS } from '../../../constants';
 import { useTimelineCalendarContext } from '../../../context/TimelineProvider';
 import type { DayBarItemProps, HighlightDates } from '../../../types';
@@ -43,6 +45,8 @@ const TimelineHeader = ({
   const [startDate, setStartDate] = useState(
     pages[viewMode].data[pages[viewMode].index] || ''
   );
+  const [monthName, setMonthName] = useState('');
+  const [weekNumber, setWeekNumber] = useState(0);
 
   const dayBarIndex = useRef(pages.week.index);
 
@@ -101,6 +105,15 @@ const TimelineHeader = ({
     [locale, highlightDates, theme, currentDate]
   );
 
+  useEffect(() => {
+    // Update monthName and weekNumber whenever startDate changes
+    if (startDate) {
+      const dateObj = new Date(startDate);
+      setWeekNumber(getISOWeek(dateObj));
+      setMonthName(format(dateObj, 'MMM', { locale: fr }));
+    }
+  }, [startDate]);
+
   const _renderDayBarList = () => {
     const listProps = {
       ref: dayBarListRef,
@@ -113,37 +126,62 @@ const TimelineHeader = ({
       scrollEventThrottle: 16,
       pagingEnabled: true,
       extraData: extraValues,
+      onScroll: (e: any) => {
+        const x = e.nativeEvent.contentOffset.x;
+        const width = e.nativeEvent.layoutMeasurement.width;
+        const pageIndex = Math.round(x / width);
+
+        if (dayBarIndex.current !== pageIndex) {
+          dayBarIndex.current = pageIndex;
+          // Update startDate when pageIndex changes
+          const newStartDate = pages[viewMode].data[pageIndex];
+          if (newStartDate) {
+            runOnJS(setStartDate)(newStartDate);
+          }
+        }
+      },
     };
 
     if (viewMode === 'day') {
       return (
-        <View style={{ width: timelineWidth }}>
+        <View>
+          <View style={[styles.leftBarDay, {width: hourWidth, height : DEFAULT_PROPS.DAY_BAR_HEIGHT, backgroundColor : theme.backgroundColor}]}>
+            <View style={theme.leftBar}>
+            <Text style={theme.leftBarText}>{monthName}</Text>
+            </View>
+            <View style={theme.leftBar}>
+            <Text style={theme.leftBarText}>Sem {weekNumber}</Text>
+            </View>
+          </View>
+
+          
           <AnimatedFlashList
             {...listProps}
             data={pages[viewMode].data}
             initialScrollIndex={pages[viewMode].index}
-            estimatedItemSize={timelineWidth}
+            estimatedItemSize={rightSideWidth}
             estimatedListSize={{
-              width: timelineWidth,
+              width: rightSideWidth,
               height: DEFAULT_PROPS.DAY_BAR_HEIGHT,
             }}
             renderItem={_renderSingleDayItem}
-            onScroll={(e) => {
-              const x = e.nativeEvent.contentOffset.x;
-              const width = e.nativeEvent.layoutMeasurement.width;
-              const pageIndex = Math.round(x / width);
-              if (dayBarIndex.current !== pageIndex) {
-                dayBarIndex.current = pageIndex;
-              }
-            }}
           />
         </View>
+        
       );
     }
 
     return (
       <View style={styles.multipleDayContainer}>
-        <View style={{ width: hourWidth }} />
+        <View style={[styles.leftBarContainer, { width: hourWidth }]}>
+          <View style={theme.leftBar}>
+            <Text style={theme.leftBarText}>{monthName}</Text>
+            </View>
+            <View style={theme.leftBar}>
+            <Text style={theme.leftBarText}>Sem {weekNumber}</Text>
+            </View>
+
+        </View>
         <View style={{ width: rightSideWidth }}>
           <AnimatedFlashList
             {...listProps}
@@ -200,7 +238,7 @@ const TimelineHeader = ({
 
   return (
     <View
-      style={[styles.container, { backgroundColor: theme.backgroundColor }]}
+      style={{ backgroundColor: theme.backgroundColor }}
     >
       {syncedLists ? _renderDayBarList() : _renderDayBarView()}
       {selectedEventId && <View style={styles.disabledFrame} />}
@@ -212,20 +250,23 @@ const TimelineHeader = ({
 export default TimelineHeader;
 
 const styles = StyleSheet.create({
-  container: {
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.22,
-    shadowRadius: 2.22,
-    elevation: 3,
-    zIndex: 99,
-  },
   multipleDayContainer: { flexDirection: 'row' },
   disabledFrame: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(255,255,255,0)',
   },
+  leftBarContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 5,
+  },
+  leftBarDay:{
+    position: "absolute",
+    gap: 5,
+    zIndex: 99,
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  }
+
 });
