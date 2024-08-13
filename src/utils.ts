@@ -48,13 +48,15 @@ export const calculateDates = (
   for (let dayIndex = 0; dayIndex < totalDays; dayIndex++) {
     const currentUnix = minWeekDateUnix + dayIndex * SECONDS_IN_DAY;
     const dateStr = minWeekDate.clone().add(dayIndex, 'd').format('YYYY-MM-DD');
+    const currentDay = minWeekDate.clone().add(dayIndex, 'd').day();
+
     if (startDay === currentUnix) {
-      if (currentUnix <= maxDateUnix) {
+      if (currentUnix <= maxDateUnix && currentDay !== 6 && currentDay !== 0) {
         day.data.push(dateStr);
       }
       startDay = currentUnix + SECONDS_IN_DAY;
     }
-    if (startWorkWeekDate === currentUnix) {
+    if (startWorkWeekDate === currentUnix && currentDay !== 6 && currentDay !== 0) {
       workWeek.data.push(dateStr);
       startWorkWeekDate = currentUnix + 7 * SECONDS_IN_DAY;
     }
@@ -76,6 +78,7 @@ export const calculateDates = (
 
   return { day, week, threeDays, workWeek };
 };
+
 
 export const calculateHours = (
   start: number,
