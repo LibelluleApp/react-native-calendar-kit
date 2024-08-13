@@ -385,6 +385,8 @@ export interface ThemeProperties {
   minimumEventHeight?: number;
 
   allowFontScaling?: boolean;
+  leftBar?: ViewStyle;
+  leftBarText?: TextStyle;
 }
 
 export interface RangeTime {
