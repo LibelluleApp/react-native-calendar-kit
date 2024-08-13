@@ -72,7 +72,7 @@ export default SingleDayBar;
 
 const styles = StyleSheet.create({
   container: { alignItems: 'center', flexDirection: 'row' },
-  dayItem: { alignItems: 'center', flex: 1 },
+  dayItem: { alignItems: 'center', flex: 1},
   dayNumBtn: {
     alignItems: 'center',
     justifyContent: 'center',
