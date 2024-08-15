@@ -124,8 +124,7 @@ const EventBlock = ({
         onPress={_onPress}
         onLongPress={_onLongPress}
         style={[
-          StyleSheet.absoluteFill,
-          { backgroundColor: event.color || EVENT_DEFAULT_COLOR },
+          StyleSheet.absoluteFill, theme.eventStyle
         ]}
         activeOpacity={0.6}
       >
