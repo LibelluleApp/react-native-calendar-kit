@@ -90,6 +90,7 @@ const styles = StyleSheet.create({
   },
   verticalLine: {
     width: 1,
+    backgroundColor: DEFAULT_PROPS.CELL_BORDER_COLOR,
     position: 'absolute',
     right: 0,
     height: '100%',
