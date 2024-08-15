@@ -382,6 +382,7 @@ export interface ThemeProperties {
 
   //Event
   eventTitle?: TextStyle;
+  eventStyle?: ViewStyle;
   minimumEventHeight?: number;
 
   allowFontScaling?: boolean;
