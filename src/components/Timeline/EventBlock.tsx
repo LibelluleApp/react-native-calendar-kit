@@ -28,7 +28,7 @@ export interface EventBlockProps {
   heightByTimeInterval: SharedValue<number>;
 }
 
-const EVENT_DEFAULT_COLOR = '#FFFFFF';
+// const EVENT_DEFAULT_COLOR = '#FFFFFF';
 
 const EventBlock = ({
   event,
