@@ -159,12 +159,20 @@ const TimelineHeader = ({
             {...listProps}
             data={pages[viewMode].data}
             initialScrollIndex={pages[viewMode].index}
-            estimatedItemSize={rightSideWidth}
+            estimatedItemSize={timelineWidth}
             estimatedListSize={{
-              width: rightSideWidth,
+              width: timelineWidth,
               height: DEFAULT_PROPS.DAY_BAR_HEIGHT,
             }}
             renderItem={_renderSingleDayItem}
+            onScroll={(e) => {
+              const x = e.nativeEvent.contentOffset.x;
+              const width = e.nativeEvent.layoutMeasurement.width;
+              const pageIndex = Math.round(x / width);
+              if (dayBarIndex.current !== pageIndex) {
+                dayBarIndex.current = pageIndex;
+              }
+            }}
           />
         </View>
         
