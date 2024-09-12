@@ -249,6 +249,7 @@ const TimelineSlots = ({
       style={styles.container}
       onScroll={_onVerticalScroll}
       scrollEnabled={!isDragging}
+      bounces={false}
     >
       <Animated.View
         style={[
