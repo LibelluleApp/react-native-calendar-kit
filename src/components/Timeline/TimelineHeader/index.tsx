@@ -20,6 +20,7 @@ interface TimelineHeaderProps {
 }
 
 const TimelineHeader = ({
+                          renderDayBarItem,
                           onPressDayNum,
                           isLoading,
                           highlightDates,
