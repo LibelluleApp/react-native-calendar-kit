@@ -20,12 +20,11 @@ interface TimelineHeaderProps {
 }
 
 const TimelineHeader = ({
-  renderDayBarItem,
-  onPressDayNum,
-  isLoading,
-  highlightDates,
-  selectedEventId,
-}: TimelineHeaderProps) => {
+                          onPressDayNum,
+                          isLoading,
+                          highlightDates,
+                          selectedEventId,
+                        }: TimelineHeaderProps) => {
   const {
     syncedLists,
     viewMode,
@@ -43,7 +42,7 @@ const TimelineHeader = ({
   } = useTimelineCalendarContext();
 
   const [startDate, setStartDate] = useState(
-    pages[viewMode].data[pages[viewMode].index] || ''
+      pages[viewMode].data[pages[viewMode].index] || ''
   );
   const [monthName, setMonthName] = useState('');
   const [weekNumber, setWeekNumber] = useState(0);
@@ -51,9 +50,9 @@ const TimelineHeader = ({
   const dayBarIndex = useRef(pages.week.index);
 
   const _renderSingleDayItem = ({
-    item,
-    extraData,
-  }: ListRenderItemInfo<string>) => {
+                                  item,
+                                  extraData,
+                                }: ListRenderItemInfo<string>) => {
     const dayItemProps = {
       width: timelineWidth,
       startDate: item,
@@ -76,9 +75,9 @@ const TimelineHeader = ({
   };
 
   const _renderMultipleDayItem = ({
-    item,
-    extraData,
-  }: ListRenderItemInfo<string>) => {
+                                    item,
+                                    extraData,
+                                  }: ListRenderItemInfo<string>) => {
     const dayItemProps = {
       width: rightSideWidth,
       startDate: item,
@@ -101,12 +100,12 @@ const TimelineHeader = ({
   };
 
   const extraValues = useMemo(
-    () => ({ locale, highlightDates, theme, currentDate }),
-    [locale, highlightDates, theme, currentDate]
+      () => ({ locale, highlightDates, theme, currentDate }),
+      [locale, highlightDates, theme, currentDate]
   );
 
   useEffect(() => {
-    // Update monthName and weekNumber whenever startDate changes
+    // Met à jour monthName et weekNumber à chaque changement de startDate
     if (startDate) {
       const dateObj = new Date(startDate);
       setWeekNumber(getISOWeek(dateObj));
@@ -133,10 +132,10 @@ const TimelineHeader = ({
 
         if (dayBarIndex.current !== pageIndex) {
           dayBarIndex.current = pageIndex;
-          // Update startDate when pageIndex changes
           const newStartDate = pages[viewMode].data[pageIndex];
+
           if (newStartDate) {
-            runOnJS(setStartDate)(newStartDate);
+            setStartDate(newStartDate);
           }
         }
       },
@@ -144,82 +143,92 @@ const TimelineHeader = ({
 
     if (viewMode === 'day') {
       return (
-        <View>
-          <View style={[styles.leftBarDay, {width: hourWidth, height : DEFAULT_PROPS.DAY_BAR_HEIGHT, backgroundColor : theme.backgroundColor}]}>
-            <View style={theme.leftBar}>
-            <Text style={theme.leftBarText}>{monthName}</Text>
+          <View>
+            <View
+                style={[
+                  styles.leftBarDay,
+                  {
+                    width: hourWidth,
+                    height: DEFAULT_PROPS.DAY_BAR_HEIGHT,
+                    backgroundColor: theme.backgroundColor,
+                  },
+                ]}
+            >
+              <View style={theme.leftBar}>
+                <Text style={theme.leftBarText}>{monthName}</Text>
+              </View>
+              <View style={theme.leftBar}>
+                <Text style={theme.leftBarText}>Sem {weekNumber}</Text>
+              </View>
             </View>
-            <View style={theme.leftBar}>
-            <Text style={theme.leftBarText}>Sem {weekNumber}</Text>
-            </View>
-          </View>
 
-          
-          <AnimatedFlashList
-            {...listProps}
-            data={pages[viewMode].data}
-            initialScrollIndex={pages[viewMode].index}
-            estimatedItemSize={timelineWidth}
-            estimatedListSize={{
-              width: timelineWidth,
-              height: DEFAULT_PROPS.DAY_BAR_HEIGHT,
-            }}
-            renderItem={_renderSingleDayItem}
-            onScroll={(e) => {
-              const x = e.nativeEvent.contentOffset.x;
-              const width = e.nativeEvent.layoutMeasurement.width;
-              const pageIndex = Math.round(x / width);
-              if (dayBarIndex.current !== pageIndex) {
-                dayBarIndex.current = pageIndex;
-              }
-            }}
-          />
-        </View>
-        
+            <AnimatedFlashList
+                {...listProps}
+                data={pages[viewMode].data}
+                initialScrollIndex={pages[viewMode].index}
+                estimatedItemSize={timelineWidth}
+                estimatedListSize={{
+                  width: timelineWidth,
+                  height: DEFAULT_PROPS.DAY_BAR_HEIGHT,
+                }}
+                renderItem={_renderSingleDayItem}
+                onScroll={(e) => {
+                  const x = e.nativeEvent.contentOffset.x;
+                  const width = e.nativeEvent.layoutMeasurement.width;
+                  const pageIndex = Math.round(x / width);
+                  if (dayBarIndex.current !== pageIndex) {
+                    dayBarIndex.current = pageIndex;
+                    const newStartDate = pages[viewMode].data[pageIndex];
+                    if (newStartDate) {
+                      setStartDate(newStartDate);
+                    }
+                  }
+                }}
+            />
+          </View>
       );
     }
 
     return (
-      <View style={styles.multipleDayContainer}>
-        <View style={[styles.leftBarContainer, { width: hourWidth }]}>
-          <View style={theme.leftBar}>
-            <Text style={theme.leftBarText}>{monthName}</Text>
+        <View style={styles.multipleDayContainer}>
+          <View style={[styles.leftBarContainer, { width: hourWidth }]}>
+            <View style={theme.leftBar}>
+              <Text style={theme.leftBarText}>{monthName}</Text>
             </View>
             <View style={theme.leftBar}>
-            <Text style={theme.leftBarText}>Sem {weekNumber}</Text>
+              <Text style={theme.leftBarText}>Sem {weekNumber}</Text>
             </View>
-
+          </View>
+          <View style={{ width: rightSideWidth }}>
+            <AnimatedFlashList
+                {...listProps}
+                data={pages[viewMode].data}
+                initialScrollIndex={pages[viewMode].index}
+                estimatedItemSize={rightSideWidth}
+                estimatedListSize={{
+                  width: rightSideWidth,
+                  height: DEFAULT_PROPS.DAY_BAR_HEIGHT,
+                }}
+                renderItem={_renderMultipleDayItem}
+            />
+          </View>
         </View>
-        <View style={{ width: rightSideWidth }}>
-          <AnimatedFlashList
-            {...listProps}
-            data={pages[viewMode].data}
-            initialScrollIndex={pages[viewMode].index}
-            estimatedItemSize={rightSideWidth}
-            estimatedListSize={{
-              width: rightSideWidth,
-              height: DEFAULT_PROPS.DAY_BAR_HEIGHT,
-            }}
-            renderItem={_renderMultipleDayItem}
-          />
-        </View>
-      </View>
     );
   };
 
   useAnimatedReaction(
-    () => currentIndex.value,
-    (index) => {
-      if (syncedLists) {
-        return;
-      }
+      () => currentIndex.value,
+      (index) => {
+        if (syncedLists) {
+          return;
+        }
 
-      const dateByIndex = pages[viewMode].data[index];
-      if (dateByIndex) {
-        runOnJS(setStartDate)(dateByIndex);
-      }
-    },
-    [viewMode, syncedLists]
+        const dateByIndex = pages[viewMode].data[index];
+        if (dateByIndex) {
+          runOnJS(setStartDate)(dateByIndex);
+        }
+      },
+      [viewMode, syncedLists]
   );
 
   const _renderDayBarView = () => {
@@ -232,26 +241,24 @@ const TimelineHeader = ({
       });
     }
     return (
-      <View style={styles.multipleDayContainer}>
-        <View style={{ width: hourWidth }} />
-        {_renderMultipleDayItem({
-          item: startDate,
-          extraData: extraValues,
-          index: 0,
-          target: 'Cell',
-        })}
-      </View>
+        <View style={styles.multipleDayContainer}>
+          <View style={{ width: hourWidth }} />
+          {_renderMultipleDayItem({
+            item: startDate,
+            extraData: extraValues,
+            index: 0,
+            target: 'Cell',
+          })}
+        </View>
     );
   };
 
   return (
-    <View
-      style={{ backgroundColor: theme.backgroundColor }}
-    >
-      {syncedLists ? _renderDayBarList() : _renderDayBarView()}
-      {selectedEventId && <View style={styles.disabledFrame} />}
-      {isLoading && <ProgressBar barColor={theme.loadingBarColor} />}
-    </View>
+      <View style={{ backgroundColor: theme.backgroundColor }}>
+        {syncedLists ? _renderDayBarList() : _renderDayBarView()}
+        {selectedEventId && <View style={styles.disabledFrame} />}
+        {isLoading && <ProgressBar barColor={theme.loadingBarColor} />}
+      </View>
   );
 };
 
@@ -268,13 +275,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 5,
   },
-  leftBarDay:{
-    position: "absolute",
+  leftBarDay: {
+    position: 'absolute',
     gap: 5,
     zIndex: 99,
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  }
-
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });
