@@ -87,12 +87,5 @@ const styles = StyleSheet.create({
   hourText: {
     position: 'absolute',
     fontSize: 10,
-  },
-  verticalLine: {
-    width: 1,
-    backgroundColor: DEFAULT_PROPS.CELL_BORDER_COLOR,
-    position: 'absolute',
-    right: 0,
-    height: '100%',
-  },
+  }
 });
