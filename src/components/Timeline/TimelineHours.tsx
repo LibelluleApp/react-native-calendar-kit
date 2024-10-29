@@ -4,7 +4,6 @@ import Animated, {
   SharedValue,
   useAnimatedStyle,
 } from 'react-native-reanimated';
-import { DEFAULT_PROPS } from '../../constants';
 import { useTimelineCalendarContext } from '../../context/TimelineProvider';
 import type { ThemeProperties } from '../../types';
 
@@ -41,7 +40,6 @@ const TimelineHours = () => {
       {hours.map(_renderHour)}
       <View
         style={[
-          styles.verticalLine,
           { top: spaceFromTop, backgroundColor: theme.cellBorderColor },
         ]}
       />
